@@ -46,6 +46,14 @@ public class ServerConfig
   @Min(1)
   private long maxScatterGatherBytes = Long.MAX_VALUE;
 
+  @JsonProperty
+  @Min(1)
+  private long maxBufferSizeInBytes = Long.MAX_VALUE;
+
+  @JsonProperty
+  @Min(1)
+  private long queryBlockingTimeout = 300_000;
+
   public int getNumThreads()
   {
     return numThreads;
@@ -64,6 +72,16 @@ public class ServerConfig
   public long getMaxScatterGatherBytes()
   {
     return maxScatterGatherBytes;
+  }
+
+  public long getMaxBufferSizeInBytes()
+  {
+    return maxBufferSizeInBytes;
+  }
+
+  public long getQueryBlockingTimeout()
+  {
+    return queryBlockingTimeout;
   }
 
   @Override

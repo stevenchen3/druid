@@ -33,6 +33,8 @@ public class QueryContexts
   public static final String MAX_SCATTER_GATHER_BYTES_KEY = "maxScatterGatherBytes";
   public static final String DEFAULT_TIMEOUT_KEY = "defaultTimeout";
   public static final String CHUNK_PERIOD_KEY = "chunkPeriod";
+  public static final String MAX_BUFFER_SIZE_IN_BYTES_KEY = "maxBufferSizeInBytes";
+  public static final String QUERY_BUFFERING_TIMEOUT = "queryBufferingTimeout";
 
   public static final boolean DEFAULT_BY_SEGMENT = false;
   public static final boolean DEFAULT_POPULATE_CACHE = true;
@@ -41,6 +43,7 @@ public class QueryContexts
   public static final int DEFAULT_UNCOVERED_INTERVALS_LIMIT = 0;
   public static final long DEFAULT_TIMEOUT_MILLIS = 300_000; // 5 minutes
   public static final long NO_TIMEOUT = 0;
+  public static final long DEFAULT_MAX_BUFFER_SIZE = 134217728; // 128 MB
 
   public static <T> boolean isBySegment(Query<T> query)
   {
@@ -135,6 +138,41 @@ public class QueryContexts
   public static <T> long getMaxScatterGatherBytes(Query<T> query)
   {
     return parseLong(query, MAX_SCATTER_GATHER_BYTES_KEY, Long.MAX_VALUE);
+  }
+
+  public static <T> Query<T> withMaxBufferSizeInBytes(Query<T> query, long maxBufferSizeInBytes)
+  {
+    Object obj = query.getContextValue(MAX_BUFFER_SIZE_IN_BYTES_KEY);
+    if (obj == null) {
+      return query.withOverriddenContext(ImmutableMap.of(MAX_BUFFER_SIZE_IN_BYTES_KEY, maxBufferSizeInBytes));
+    } else {
+      long current = ((Number) obj).longValue();
+      if (current > maxBufferSizeInBytes) {
+        throw new IAE(
+                "configured [%s = %s] is more than enforced limit of [%s].",
+                MAX_BUFFER_SIZE_IN_BYTES_KEY,
+                current,
+                maxBufferSizeInBytes
+        );
+      } else {
+        return query;
+      }
+    }
+  }
+
+  public static <T> long getMaxBufferSizeInBytes(Query<T> query)
+  {
+    return parseLong(query, MAX_BUFFER_SIZE_IN_BYTES_KEY, DEFAULT_MAX_BUFFER_SIZE);
+  }
+
+  public static <T> Query<T> withQueryBlockingTimeout(Query<T> query, long blockingTimeout)
+  {
+    return query.withOverriddenContext(ImmutableMap.of(QUERY_BUFFERING_TIMEOUT, blockingTimeout));
+  }
+
+  public static <T> long getQueryBlockingTimeout(Query<T> query)
+  {
+    return parseLong(query, QUERY_BUFFERING_TIMEOUT, DEFAULT_TIMEOUT_MILLIS);
   }
 
   public static <T> boolean hasTimeout(Query<T> query)
