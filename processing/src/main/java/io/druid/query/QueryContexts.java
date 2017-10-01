@@ -43,7 +43,6 @@ public class QueryContexts
   public static final int DEFAULT_UNCOVERED_INTERVALS_LIMIT = 0;
   public static final long DEFAULT_TIMEOUT_MILLIS = 300_000; // 5 minutes
   public static final long NO_TIMEOUT = 0;
-  public static final long DEFAULT_MAX_BUFFER_SIZE = 134217728; // 128 MB
 
   public static <T> boolean isBySegment(Query<T> query)
   {
@@ -162,7 +161,7 @@ public class QueryContexts
 
   public static <T> long getMaxBufferSizeInBytes(Query<T> query)
   {
-    return parseLong(query, MAX_BUFFER_SIZE_IN_BYTES_KEY, DEFAULT_MAX_BUFFER_SIZE);
+    return parseLong(query, MAX_BUFFER_SIZE_IN_BYTES_KEY, Long.MAX_VALUE);
   }
 
   public static <T> Query<T> withQueryBlockingTimeout(Query<T> query, long blockingTimeout)
