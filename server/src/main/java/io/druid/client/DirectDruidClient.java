@@ -321,10 +321,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
 
                       try {
                         BufferedStream stream = queue.poll(checkQueryTimeout(), TimeUnit.MILLISECONDS);
-                        synchronized (totalBufferedBytes) {
-                          final long newValue = totalBufferedBytes.get() - stream.getBytes();
-                          totalBufferedBytes.set(newValue);
-                        }
+                        totalBufferedBytes.addAndGet(-stream.getBytes());
                         log.debug(StringUtils.format(
                               "Free %d bytes, buffered %d bytes, remaining %d bytes, queue size: %d",
                               stream.getBytes(),
@@ -486,7 +483,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
           return maxBufferSizeInBytes - totalBufferedBytes.get();
         }
 
-        private synchronized void checkBufferCapacity(long bytes, long timeoutMs)
+        private void checkBufferCapacity(long bytes, long timeoutMs)
         {
           log.debug(StringUtils.format(
                 "Requesting %d bytes, buffered %d bytes, remaining %d bytes, queue size: %d",
@@ -503,7 +500,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
           }
           if (isTimeout) {
             String msg = StringUtils.format(
-                    "Query[%s] url[%s] max buffer limit reached.",
+                    "Query[%s] url[%s] max buffer limit reached: waiting for free buffer timeout",
                     query.getId(),
                     url
             );
