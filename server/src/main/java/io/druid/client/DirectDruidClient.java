@@ -264,14 +264,14 @@ public class DirectDruidClient<T> implements QueryRunner<T>
                   )
               );
             }
+
             checkBufferCapacity(bytes, queryBlockingTimeout);
             queue.put(new BufferedStream(new ChannelBufferInputStream(response.getContent()), bytes));
-            totalBufferedBytes.addAndGet(bytes);
 
-            log.info(StringUtils.format(
+            log.debug(StringUtils.format(
                   "Put %d bytes into buffer, buffered %d bytes, queue size: %d",
-                  totalBufferedBytes.get(),
                   bytes,
+                  totalBufferedBytes.get(),
                   queue.size()));
           }
           catch (final IOException e) {
@@ -325,7 +325,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
                           final long newValue = totalBufferedBytes.get() - stream.getBytes();
                           totalBufferedBytes.set(newValue);
                         }
-                        log.info(StringUtils.format(
+                        log.debug(StringUtils.format(
                               "Free %d bytes, buffered %d bytes, remaining %d bytes, queue size: %d",
                               stream.getBytes(),
                               totalBufferedBytes.get(),
@@ -362,10 +362,9 @@ public class DirectDruidClient<T> implements QueryRunner<T>
             try {
               checkBufferCapacity(bytes, queryBlockingTimeout);
               queue.put(new BufferedStream(new ChannelBufferInputStream(channelBuffer), bytes));
-              totalBufferedBytes.addAndGet(bytes);
 
-              log.info(StringUtils.format(
-                    "Put %d bytes into buffer, buffered %d bytes, queue size: %d",
+              log.debug(StringUtils.format(
+                    "[chunking] Put %d bytes into buffer, buffered %d bytes, queue size: %d",
                     bytes,
                     totalBufferedBytes.get(),
                     queue.size()));
@@ -403,7 +402,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
               // An empty byte array is put at the end to give the SequenceInputStream.close() as something to close out
               // after done is set to true, regardless of the rest of the stream's state.
               queue.put(new BufferedStream(ByteSource.empty().openStream(), 0));
-              log.info(StringUtils.format(
+              log.debug(StringUtils.format(
                     "End of buffering, buffered %d bytes, queue size: %d",
                     totalBufferedBytes.get(),
                     queue.size()));
@@ -487,9 +486,9 @@ public class DirectDruidClient<T> implements QueryRunner<T>
           return maxBufferSizeInBytes - totalBufferedBytes.get();
         }
 
-        private void checkBufferCapacity(long bytes, long timeoutMs)
+        private synchronized void checkBufferCapacity(long bytes, long timeoutMs)
         {
-          log.info(StringUtils.format(
+          log.debug(StringUtils.format(
                 "Requesting %d bytes, buffered %d bytes, remaining %d bytes, queue size: %d",
                 bytes,
                 totalBufferedBytes.get(),
@@ -510,6 +509,8 @@ public class DirectDruidClient<T> implements QueryRunner<T>
             );
             setupResponseReadFailure(msg, null);
             throw new RE(msg);
+          } else {
+            totalBufferedBytes.addAndGet(bytes);
           }
         }
       };
