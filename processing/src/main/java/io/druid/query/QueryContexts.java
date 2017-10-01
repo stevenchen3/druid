@@ -34,7 +34,7 @@ public class QueryContexts
   public static final String DEFAULT_TIMEOUT_KEY = "defaultTimeout";
   public static final String CHUNK_PERIOD_KEY = "chunkPeriod";
   public static final String MAX_BUFFER_SIZE_IN_BYTES_KEY = "maxBufferSizeInBytes";
-  public static final String QUERY_BUFFERING_TIMEOUT = "queryBufferingTimeout";
+  public static final String QUERY_BUFFERING_TIMEOUT_KEY = "queryBufferingTimeout";
 
   public static final boolean DEFAULT_BY_SEGMENT = false;
   public static final boolean DEFAULT_POPULATE_CACHE = true;
@@ -167,12 +167,12 @@ public class QueryContexts
 
   public static <T> Query<T> withQueryBlockingTimeout(Query<T> query, long blockingTimeout)
   {
-    return query.withOverriddenContext(ImmutableMap.of(QUERY_BUFFERING_TIMEOUT, blockingTimeout));
+    return query.withOverriddenContext(ImmutableMap.of(QUERY_BUFFERING_TIMEOUT_KEY, blockingTimeout));
   }
 
   public static <T> long getQueryBlockingTimeout(Query<T> query)
   {
-    return parseLong(query, QUERY_BUFFERING_TIMEOUT, DEFAULT_TIMEOUT_MILLIS);
+    return parseLong(query, QUERY_BUFFERING_TIMEOUT_KEY, DEFAULT_TIMEOUT_MILLIS);
   }
 
   public static <T> boolean hasTimeout(Query<T> query)
