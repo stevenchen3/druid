@@ -114,24 +114,25 @@ public class QueryContexts
     return query.getContextValue(CHUNK_PERIOD_KEY, "P0D");
   }
 
-  public static <T> Query<T> withMaxScatterGatherBytes(Query<T> query, long maxScatterGatherBytesLimit)
+  private static <T> Query<T> withCustomizedArgument(Query<T> query, String key, long value)
   {
-    Object obj = query.getContextValue(MAX_SCATTER_GATHER_BYTES_KEY);
+    Object obj = query.getContextValue(key);
     if (obj == null) {
-      return query.withOverriddenContext(ImmutableMap.of(MAX_SCATTER_GATHER_BYTES_KEY, maxScatterGatherBytesLimit));
+      return query.withOverriddenContext(ImmutableMap.of(key, value));
     } else {
       long curr = ((Number) obj).longValue();
-      if (curr > maxScatterGatherBytesLimit) {
-        throw new IAE(
-            "configured [%s = %s] is more than enforced limit of [%s].",
-            MAX_SCATTER_GATHER_BYTES_KEY,
-            curr,
-            maxScatterGatherBytesLimit
-        );
+      if (curr > value) {
+        String err = "configured [%s = %s] is more than enforced limit of [%s].";
+        throw new IAE(err, key, curr, value);
       } else {
         return query;
       }
     }
+  }
+
+  public static <T> Query<T> withMaxScatterGatherBytes(Query<T> query, long maxScatterGatherBytesLimit)
+  {
+    return withCustomizedArgument(query, MAX_SCATTER_GATHER_BYTES_KEY, maxScatterGatherBytesLimit);
   }
 
   public static <T> long getMaxScatterGatherBytes(Query<T> query)
@@ -141,22 +142,7 @@ public class QueryContexts
 
   public static <T> Query<T> withMaxBufferSizeBytes(Query<T> query, long maxBufferSizeBytes)
   {
-    Object obj = query.getContextValue(MAX_BUFFER_SIZE_BYTES);
-    if (obj == null) {
-      return query.withOverriddenContext(ImmutableMap.of(MAX_BUFFER_SIZE_BYTES, maxBufferSizeBytes));
-    } else {
-      long current = ((Number) obj).longValue();
-      if (current > maxBufferSizeBytes) {
-        throw new IAE(
-                "configured [%s = %s] is more than enforced limit of [%s].",
-                MAX_BUFFER_SIZE_BYTES,
-                current,
-                maxBufferSizeBytes
-        );
-      } else {
-        return query;
-      }
-    }
+    return withCustomizedArgument(query, MAX_BUFFER_SIZE_BYTES, maxBufferSizeBytes);
   }
 
   public static <T> long getMaxBufferSizeBytes(Query<T> query)
