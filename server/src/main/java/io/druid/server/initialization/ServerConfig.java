@@ -48,7 +48,7 @@ public class ServerConfig
 
   @JsonProperty
   @Min(65535)
-  private long maxBufferSizeInBytes = Long.MAX_VALUE;
+  private long maxBufferSizeBytes = Long.MAX_VALUE;
 
   @JsonProperty
   @Min(1)
@@ -74,9 +74,9 @@ public class ServerConfig
     return maxScatterGatherBytes;
   }
 
-  public long getMaxBufferSizeInBytes()
+  public long getMaxBufferSizeBytes()
   {
-    return maxBufferSizeInBytes;
+    return maxBufferSizeBytes;
   }
 
   public long getQueryBlockingTimeout()
@@ -97,7 +97,7 @@ public class ServerConfig
     return numThreads == that.numThreads &&
            defaultQueryTimeout == that.defaultQueryTimeout &&
            maxScatterGatherBytes == that.maxScatterGatherBytes &&
-           maxBufferSizeInBytes == that.maxBufferSizeInBytes &&
+           maxBufferSizeBytes == that.maxBufferSizeBytes &&
            queryBlockingTimeout == that.queryBlockingTimeout &&
            Objects.equals(maxIdleTime, that.maxIdleTime);
   }
@@ -110,7 +110,7 @@ public class ServerConfig
             maxIdleTime,
             defaultQueryTimeout,
             maxScatterGatherBytes,
-            maxBufferSizeInBytes,
+            maxBufferSizeBytes,
             queryBlockingTimeout
     );
   }
@@ -123,7 +123,7 @@ public class ServerConfig
            ", maxIdleTime=" + maxIdleTime +
            ", defaultQueryTimeout=" + defaultQueryTimeout +
            ", maxScatterGatherBytes=" + maxScatterGatherBytes +
-           ", maxBufferSizeInBytes=" + maxBufferSizeInBytes +
+           ", maxBufferSizeBytes=" + maxBufferSizeBytes +
            ", queryBlockingTimeout=" + queryBlockingTimeout +
            '}';
   }

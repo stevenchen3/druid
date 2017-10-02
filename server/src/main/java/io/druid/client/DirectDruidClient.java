@@ -124,7 +124,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
     return (QueryType) QueryContexts.withMaxScatterGatherBytes(
         QueryContexts.withDefaultTimeout(
             QueryContexts.withQueryBlockingTimeout(
-                QueryContexts.withMaxBufferSizeInBytes((Query) query, serverConfig.getMaxBufferSizeInBytes()),
+                QueryContexts.withMaxBufferSizeBytes((Query) query, serverConfig.getMaxBufferSizeBytes()),
                 serverConfig.getQueryBlockingTimeout()),
             serverConfig.getDefaultQueryTimeout()
         ),
@@ -218,7 +218,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
 
       final long timeoutAt = ((Long) context.get(QUERY_FAIL_TIME)).longValue();
       final long maxScatterGatherBytes = QueryContexts.getMaxScatterGatherBytes(query);
-      final long maxBufferSizeInBytes = QueryContexts.getMaxBufferSizeInBytes(query);
+      final long maxBufferSizeBytes = QueryContexts.getMaxBufferSizeBytes(query);
       final long queryBlockingTimeout = QueryContexts.getQueryBlockingTimeout(query);
       AtomicLong totalBytesGathered = (AtomicLong) context.get(QUERY_TOTAL_BYTES_GATHERED);
       AtomicLong totalBufferedBytes = new AtomicLong(0);
@@ -480,7 +480,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
 
         private long getBufferCapacity()
         {
-          return maxBufferSizeInBytes - totalBufferedBytes.get();
+          return maxBufferSizeBytes - totalBufferedBytes.get();
         }
 
         private void checkBufferCapacity(long bytes, long timeoutMs)
@@ -493,7 +493,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
                 queue.size()));
           final long startTimeMs = System.currentTimeMillis();
           boolean isTimeout = false;
-          while (maxBufferSizeInBytes < Long.MAX_VALUE && getBufferCapacity() < bytes && !isTimeout) {
+          while (maxBufferSizeBytes < Long.MAX_VALUE && getBufferCapacity() < bytes && !isTimeout) {
             if (System.currentTimeMillis() - startTimeMs > timeoutMs) {
               isTimeout = true;
             }

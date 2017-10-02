@@ -33,7 +33,7 @@ public class QueryContexts
   public static final String MAX_SCATTER_GATHER_BYTES_KEY = "maxScatterGatherBytes";
   public static final String DEFAULT_TIMEOUT_KEY = "defaultTimeout";
   public static final String CHUNK_PERIOD_KEY = "chunkPeriod";
-  public static final String MAX_BUFFER_SIZE_IN_BYTES_KEY = "maxBufferSizeInBytes";
+  public static final String MAX_BUFFER_SIZE_BYTES = "maxBufferSizeBytes";
   public static final String QUERY_BUFFERING_TIMEOUT_KEY = "queryBufferingTimeout";
 
   public static final boolean DEFAULT_BY_SEGMENT = false;
@@ -139,19 +139,19 @@ public class QueryContexts
     return parseLong(query, MAX_SCATTER_GATHER_BYTES_KEY, Long.MAX_VALUE);
   }
 
-  public static <T> Query<T> withMaxBufferSizeInBytes(Query<T> query, long maxBufferSizeInBytes)
+  public static <T> Query<T> withMaxBufferSizeBytes(Query<T> query, long maxBufferSizeBytes)
   {
-    Object obj = query.getContextValue(MAX_BUFFER_SIZE_IN_BYTES_KEY);
+    Object obj = query.getContextValue(MAX_BUFFER_SIZE_BYTES);
     if (obj == null) {
-      return query.withOverriddenContext(ImmutableMap.of(MAX_BUFFER_SIZE_IN_BYTES_KEY, maxBufferSizeInBytes));
+      return query.withOverriddenContext(ImmutableMap.of(MAX_BUFFER_SIZE_BYTES, maxBufferSizeBytes));
     } else {
       long current = ((Number) obj).longValue();
-      if (current > maxBufferSizeInBytes) {
+      if (current > maxBufferSizeBytes) {
         throw new IAE(
                 "configured [%s = %s] is more than enforced limit of [%s].",
-                MAX_BUFFER_SIZE_IN_BYTES_KEY,
+                MAX_BUFFER_SIZE_BYTES,
                 current,
-                maxBufferSizeInBytes
+                maxBufferSizeBytes
         );
       } else {
         return query;
@@ -159,9 +159,9 @@ public class QueryContexts
     }
   }
 
-  public static <T> long getMaxBufferSizeInBytes(Query<T> query)
+  public static <T> long getMaxBufferSizeBytes(Query<T> query)
   {
-    return parseLong(query, MAX_BUFFER_SIZE_IN_BYTES_KEY, Long.MAX_VALUE);
+    return parseLong(query, MAX_BUFFER_SIZE_BYTES, Long.MAX_VALUE);
   }
 
   public static <T> Query<T> withQueryBlockingTimeout(Query<T> query, long blockingTimeout)
