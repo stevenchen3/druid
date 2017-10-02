@@ -125,7 +125,7 @@ public class DirectDruidClient<T> implements QueryRunner<T>
         QueryContexts.withDefaultTimeout(
             QueryContexts.withQueryBlockingTimeout(
                 QueryContexts.withMaxBufferSizeBytes((Query) query, serverConfig.getMaxBufferSizeBytes()),
-                serverConfig.getQueryBlockingTimeout()),
+                serverConfig.getQueryBufferingTimeout()),
             serverConfig.getDefaultQueryTimeout()
         ),
         serverConfig.getMaxScatterGatherBytes()
