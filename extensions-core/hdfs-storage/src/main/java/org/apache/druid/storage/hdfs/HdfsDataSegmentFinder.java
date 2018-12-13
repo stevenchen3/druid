@@ -113,13 +113,14 @@ public class HdfsDataSegmentFinder implements DataSegmentFinder
 
             final Map<String, Object> loadSpec = dataSegment.getLoadSpec();
             final String pathWithoutScheme = indexZip.toUri().getPath();
+            final String pathWithScheme = indexZip.toUri().toString();
 
             if (!loadSpec.get("type").equals(HdfsStorageDruidModule.SCHEME) || !loadSpec.get("path")
                                                                                         .equals(pathWithoutScheme)) {
               loadSpec.put("type", HdfsStorageDruidModule.SCHEME);
-              loadSpec.put("path", pathWithoutScheme);
+              loadSpec.put("path", pathWithScheme);
               if (updateDescriptor) {
-                log.info("Updating loadSpec in descriptor.json at [%s] with new path [%s]", path, pathWithoutScheme);
+                log.info("Updating loadSpec in descriptor.json at [%s] with new path [%s]", path, pathWithScheme);
                 mapper.writeValue(fs.create(path, true), dataSegment);
               }
             }
